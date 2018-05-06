@@ -1,11 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:local="clr-namespace:Takanome"
-             x:Class="Takanome.MainPage">
+			xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+			xmlns:local="clr-namespace:Takanome"
+			Appearing="MainPage_Appearing"
+			Disappearing="MainPage_Disappearing"
+			x:Class="Takanome.MainPage"
+			Title="Takanome">
 
-	<Label Text="Welcome to Xamarin.Forms!" 
-           VerticalOptions="Center" 
-           HorizontalOptions="Center" />
+	<StackLayout Orientation="Vertical">
+		<Label Text="検索ワード" FontSize="Large"
+			VerticalOptions="Center" 
+			HorizontalOptions="Center"/>
+		<Entry Text="{Binding SearchWord.Value}" FontSize="Large"/>
+		<Button Text="検索" FontSize="Large" Command="{Binding SearchStartCommand}"/>
+		<ListView ItemsSource="{Binding SearchResult.Value}"/>
+	</StackLayout>
 
 </ContentPage>
