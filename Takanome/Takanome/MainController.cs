@@ -9,6 +9,7 @@ using System.Reactive.Linq;
 using System.Text;
 using Xamarin.Forms;
 using static CoreTweet.OAuth;
+using System.Text.RegularExpressions;
 
 namespace Takanome
 {
@@ -16,7 +17,7 @@ namespace Takanome
 	{
 		public event PropertyChangedEventHandler PropertyChanged;
 
-		public ReactiveProperty<string> SearchWord { get; } = new ReactiveProperty<string>("艦これ");
+		public ReactiveProperty<string> SearchWord { get; } = new ReactiveProperty<string>("YSR");
 		public ReactiveProperty<string> SelectTweet { get; } = new ReactiveProperty<string>();
 		public ReadOnlyReactiveCollection<string> SearchResult { get; }
 		public ReactiveCommand SearchStartCommand { get; }
@@ -35,8 +36,13 @@ namespace Takanome
 				progressFlg.Value = true;
 				searchResult.Clear();
 				try {
-					foreach (var status in await apponly.Search.TweetsAsync(q => SearchWord.Value + " exclude:retweets lang:ja")) {
-						if (!status.Text.Contains(SearchWord.Value))
+					foreach (var status in await apponly.Search.TweetsAsync(count => 100, q => SearchWord.Value + " exclude:retweets lang:ja")) {
+						string tweet = status.Text;
+						if(tweet == null)
+							continue;
+						Regex rgx = new Regex("@[A-Za-z_]+");
+						tweet = rgx.Replace(tweet, "");
+						if (!tweet.Contains(SearchWord.Value))
 							continue;
 						searchResult.Add(status.Text);
 					}
@@ -44,10 +50,9 @@ namespace Takanome
 				catch (TwitterException e) {
 					Console.WriteLine(e.Message);
 					Console.WriteLine(e.StackTrace);
-					string message = e.Message;
-					var response = await apponly.Application.RateLimitStatusAsync("resources");
-					var reset = response["resources"]["/users/search"].Reset;
-					message += "\n" + reset.ToString();
+					var reset = e.RateLimit.Reset;
+					var fixedReset = reset.ToUniversalTime().AddHours(9);
+					string message = e.Message + "\n" + fixedReset.ToString("yyyy/MMM/dd HH:mm:ss zzz") + "に規制解除";
 					MessagingCenter.Send(this, "DisplayAlert", new AlertParameter() {
 						Title = "Takanome",
 						Message = message
@@ -58,6 +63,9 @@ namespace Takanome
 					Console.WriteLine(e.StackTrace);
 				}
 				finally {
+					if(searchResult.Count == 0) {
+						searchResult.Add("<なし>");
+					}
 					progressFlg.Value = false;
 				}
 			});
