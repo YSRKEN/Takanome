@@ -10,6 +10,7 @@ using System.Text;
 using Xamarin.Forms;
 using static CoreTweet.OAuth;
 using System.Text.RegularExpressions;
+using CoreTweet.Core;
 
 namespace Takanome
 {
@@ -24,19 +25,24 @@ namespace Takanome
 
 		private ObservableCollection<string> searchResult = new ObservableCollection<string>();
 		private ReactiveProperty<bool> progressFlg = new ReactiveProperty<bool>(false);
-		private OAuth2Token apponly;
+		private TokensBase token;
 
 		public MainController() {
 			SearchStartCommand = SearchWord.Select(s => s.Length != 0).CombineLatest(progressFlg, (x, y) => x & !y).ToReactiveCommand();
 			SearchResult = searchResult.ToReadOnlyReactiveCollection();
 			//
-			apponly = OAuth2.GetToken(Consumer.Key, Consumer.Secret);
+			if (true) {
+				token = Tokens.Create(TwiDev.CK, TwiDev.CS, TwiDev.AT, TwiDev.ATS);
+			}
+			else {
+				token = OAuth2.GetToken(Consumer.Key, Consumer.Secret);
+			}
 			//
 			SearchStartCommand.Subscribe(async _ => {
 				progressFlg.Value = true;
 				searchResult.Clear();
 				try {
-					foreach (var status in await apponly.Search.TweetsAsync(count => 100, q => SearchWord.Value + " exclude:retweets lang:ja")) {
+					foreach (var status in await token.Search.TweetsAsync(/*count => 100, */q => SearchWord.Value + " exclude:retweets lang:ja")) {
 						string tweet = status.Text;
 						if(tweet == null)
 							continue;
@@ -57,13 +63,15 @@ namespace Takanome
 						Title = "Takanome",
 						Message = message
 					});
+					if (searchResult.Count == 0) {
+						searchResult.Add("<なし>");
+					}
+					progressFlg.Value = false;
 				}
 				catch(Exception e) {
 					Console.WriteLine(e.Message);
 					Console.WriteLine(e.StackTrace);
-				}
-				finally {
-					if(searchResult.Count == 0) {
+					if (searchResult.Count == 0) {
 						searchResult.Add("<なし>");
 					}
 					progressFlg.Value = false;

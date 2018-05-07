@@ -287,3 +287,4 @@ __pycache__/
 *.odx.cs
 *.xsd.cs
 Takanome/Takanome/Consumer.cs
+Takanome/Takanome/Twidev.cs
