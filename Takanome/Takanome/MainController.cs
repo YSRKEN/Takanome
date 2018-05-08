@@ -18,7 +18,7 @@ namespace Takanome
 	{
 		public event PropertyChangedEventHandler PropertyChanged;
 
-		public ReactiveProperty<string> SearchWord { get; } = new ReactiveProperty<string>("YSR");
+		public ReactiveProperty<string> SearchWord { get; } = new ReactiveProperty<string>("Xamarin.Forms");
 		public ReactiveProperty<string> SelectTweet { get; } = new ReactiveProperty<string>();
 		public ReadOnlyReactiveCollection<string> SearchResult { get; }
 		public ReactiveCommand SearchStartCommand { get; }
@@ -31,8 +31,13 @@ namespace Takanome
 			SearchStartCommand = SearchWord.Select(s => s.Length != 0).CombineLatest(progressFlg, (x, y) => x & !y).ToReactiveCommand();
 			SearchResult = searchResult.ToReadOnlyReactiveCollection();
 			//
-			if (true) {
+			if (false) {
 				token = Tokens.Create(TwiDev.CK, TwiDev.CS, TwiDev.AT, TwiDev.ATS);
+			}
+			else if (true) {
+				var session = Authorize(Consumer.Key, Consumer.Secret);
+				Device.OpenUri(session.AuthorizeUri);
+
 			}
 			else {
 				token = OAuth2.GetToken(Consumer.Key, Consumer.Secret);
@@ -42,7 +47,7 @@ namespace Takanome
 				progressFlg.Value = true;
 				searchResult.Clear();
 				try {
-					foreach (var status in await token.Search.TweetsAsync(/*count => 100, */q => SearchWord.Value + " exclude:retweets lang:ja")) {
+					foreach (var status in await token.Search.TweetsAsync(count => 100, q => SearchWord.Value + " exclude:retweets lang:ja")) {
 						string tweet = status.Text;
 						if(tweet == null)
 							continue;
