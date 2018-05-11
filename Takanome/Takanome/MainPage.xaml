@@ -8,12 +8,35 @@
 			Title="Takanome">
 
 	<StackLayout Orientation="Vertical">
-		<Label Text="検索ワード" FontSize="Large"
-			VerticalOptions="Center" 
+		<Label Text="{Binding LabelText.Value}" FontSize="Large"
+			VerticalOptions="Center"
 			HorizontalOptions="Center"/>
 		<Entry Text="{Binding SearchWord.Value}" FontSize="Large"/>
-		<Button Text="検索" FontSize="Large" Command="{Binding SearchStartCommand}"/>
-		<ListView ItemsSource="{Binding SearchResult}" SelectedItem="{Binding SelectTweet.Value}"/>
+		<Button Text="{Binding ButtonText.Value}" FontSize="Large" Command="{Binding SearchStartCommand}"/>
+		<ListView ItemsSource="{Binding SearchResult}" SelectedItem="{Binding SelectTweet.Value}"
+				IsVisible="{Binding showListViewFlg.Value}">
+			<ListView.ItemTemplate>
+				<DataTemplate>
+					<ViewCell>
+						<Grid>
+							<Grid.RowDefinitions>
+								<RowDefinition Height="auto"/>
+								<RowDefinition Height="auto"/>
+							</Grid.RowDefinitions>
+							<Grid Grid.Row="0">
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="auto"/>
+									<ColumnDefinition Width="auto"/>
+								</Grid.ColumnDefinitions>
+								<Label Grid.Column="0" Text="{Binding User.Name}" FontSize="Micro"/>
+								<Label Grid.Column="1" Text="{Binding User.ScreenName, StringFormat='@{0}'}" FontSize="Micro"/>
+							</Grid>
+							<Label Grid.Row="1" Text="{Binding Text}" FontSize="Micro"/>
+						</Grid>
+					</ViewCell>
+				</DataTemplate>
+			</ListView.ItemTemplate>
+		</ListView>
 	</StackLayout>
 
 </ContentPage>
