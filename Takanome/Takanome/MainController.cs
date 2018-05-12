@@ -182,13 +182,24 @@ namespace Takanome
 			}
 			// マッチングを行う
 			string tweet2 = tweet.Normalize(NormalizationForm.FormKC);
+			Func<string, string, bool> matchFunc = (t, s) => {
+				bool reverseFlg = (s[0] == '-');
+				s = Regex.Replace(s, "^-", "");
+				s = Regex.Replace(s, "\"", "");
+				if (reverseFlg) {
+					return !t.Contains(s);
+				}
+				else {
+					return t.Contains(s);
+				}
+			};
 			if(andKeyword.Count != 0) {
-				if(!andKeyword.All(str => tweet2.Contains(str))) {
+				if(!andKeyword.All(str => matchFunc(tweet2, str))) {
 					return false;
 				}
 			}
 			if (orKeyword.Count != 0) {
-				if (!orKeyword.Any(str => tweet2.Contains(str))) {
+				if (!orKeyword.Any(str => matchFunc(tweet2, str))) {
 					return false;
 				}
 			}
