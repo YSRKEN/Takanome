@@ -6,12 +6,12 @@ using Android.App;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Takanome.Android")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("Twitter Search Application by Xamarin.Forms")]
+[assembly: AssemblyDescription("このアセンブリにはバージョン情報が設定されています")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("YSRKEN")]
 [assembly: AssemblyProduct("Takanome.Android")]
-[assembly: AssemblyCopyright("Copyright ©  2014")]
+[assembly: AssemblyCopyright("Copyright © 2018 YSR Labo.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: ComVisible(false)]
