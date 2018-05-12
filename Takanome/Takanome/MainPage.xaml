@@ -15,7 +15,7 @@
 		<Entry Text="{Binding SearchWord.Value}" FontSize="Large"/>
 		<Button Text="{Binding ButtonText.Value}" FontSize="Large" Command="{Binding SearchStartCommand}"/>
 		<ListView ItemsSource="{Binding SearchResult}" SelectedItem="{Binding SelectTweet.Value}"
-				IsVisible="{Binding showListViewFlg.Value}">
+				IsVisible="{Binding showListViewFlg.Value}" HasUnevenRows = "True">
 			<ListView.ItemTemplate>
 				<DataTemplate>
 					<ViewCell>
