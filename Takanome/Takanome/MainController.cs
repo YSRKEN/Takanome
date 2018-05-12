@@ -33,6 +33,10 @@ namespace Takanome
 		private ReactiveProperty<bool> getTokenFlg = new ReactiveProperty<bool>(false);
 		private OAuthSession session;
 		private Tokens token;
+		private List<string> botList = new List<string> {
+			"twittbot.net", "IFTTT", "rakubo2", "makebot.sh", "BotMaker",
+			"twiroboJP", "Easybotter"
+		};
 
 		public MainController() {
 			LabelText = getTokenFlg.Select(flg => flg ? "PINコード" : "検索ワード").ToReadOnlyReactiveProperty();
@@ -78,7 +82,6 @@ namespace Takanome
 			// 検索処理
 			progressFlg.Value = true;
 			searchResult.Clear();
-			var botList = new List<string> { "twittbot.net", "IFTTT", "rakubo2" };
 			try {
 				foreach (var status in await token.Search.TweetsAsync(count => 100, q => SearchWord.Value + " exclude:retweets lang:ja")) {
 					// ツイート本文が存在し、
