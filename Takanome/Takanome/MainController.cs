@@ -155,7 +155,7 @@ namespace Takanome
 					continue;
 				if (Regex.IsMatch(keyword, "(-|)filter:(images|videos|links|verified)"))
 					continue;
-				if (Regex.IsMatch(keyword, "(-|)source:[A-Za-z0-9_]+"))
+				if (Regex.IsMatch(keyword, "(-|)(source|exclude|include|near|within):[A-Za-z0-9_]+"))
 					continue;
 				// どんどん追加していく
 				temp2.Add(keyword);
