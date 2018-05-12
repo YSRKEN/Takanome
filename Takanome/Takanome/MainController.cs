@@ -26,6 +26,7 @@ namespace Takanome
 		public ReadOnlyReactiveCollection<Status> SearchResult { get; }
 		private ReadOnlyReactiveProperty<bool> showListViewFlg { get; }
 		public ReactiveCommand SearchStartCommand { get; }
+		public ReactiveCommand LoginCommand { get; } = new ReactiveCommand();
 
 		private ObservableCollection<Status> searchResult = new ObservableCollection<Status>();
 		private ReactiveProperty<bool> progressFlg = new ReactiveProperty<bool>(false);
@@ -40,6 +41,7 @@ namespace Takanome
 			SearchStartCommand = SearchWord.Select(s => s.Length != 0).CombineLatest(progressFlg, (x, y) => x & !y).ToReactiveCommand();
 			SearchResult = searchResult.ToReadOnlyReactiveCollection();
 			//
+			LoginCommand.Subscribe(_ => Login());
 			SearchStartCommand.Subscribe(async _ => {
 				if (getTokenFlg.Value) {
 					// トークン入力処理
@@ -59,17 +61,7 @@ namespace Takanome
 				}
 			});
 			//
-			if (true) {
-				token = Tokens.Create(TwiDev.CK, TwiDev.CS, TwiDev.AT, TwiDev.ATS);
-			}
-			else if (true) {
-				session = Authorize(Consumer.Key, Consumer.Secret);
-				Device.OpenUri(session.AuthorizeUri);
-				getTokenFlg.Value = true;
-			}
-			else {
-				//token = OAuth2.GetToken(Consumer.Key, Consumer.Secret);
-			}
+			Login();
 		}
 
 		private async Task SearchTweet() {
@@ -119,6 +111,12 @@ namespace Takanome
 				Console.WriteLine(e.StackTrace);
 				progressFlg.Value = false;
 			}
+		}
+
+		private void Login() {
+			getTokenFlg.Value = true;
+			session = Authorize(Consumer.Key, Consumer.Secret);
+			Device.OpenUri(session.AuthorizeUri);
 		}
 	}
 	static class Utility

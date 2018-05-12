@@ -8,6 +8,7 @@
 			Title="Takanome">
 
 	<StackLayout Orientation="Vertical">
+		<Button Text="再ログイン" FontSize="Large" Command="{Binding LoginCommand}"/>
 		<Label Text="{Binding LabelText.Value}" FontSize="Large"
 			VerticalOptions="Center"
 			HorizontalOptions="Center"/>
