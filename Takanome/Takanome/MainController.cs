@@ -151,7 +151,7 @@ namespace Takanome
 				// 各種検索コマンドは無視する
 				if (Regex.IsMatch(keyword, "(since|until):\\d+-\\d+-\\d+"))
 					continue;
-				if (Regex.IsMatch(keyword, "(-|)(@|from|to):[A-Za-z_]+"))
+				if (Regex.IsMatch(keyword, "(-|)(@|from|to|lang):[A-Za-z_]+"))
 					continue;
 				if (Regex.IsMatch(keyword, "(-|)filter:(images|videos|links|verified)"))
 					continue;
