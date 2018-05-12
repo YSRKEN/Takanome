@@ -83,7 +83,7 @@ namespace Takanome
 			progressFlg.Value = true;
 			searchResult.Clear();
 			try {
-				foreach (var status in await token.Search.TweetsAsync(count => 100, q => SearchWord.Value + " exclude:retweets lang:ja")) {
+				foreach (var status in await token.Search.TweetsAsync(count => 100, q => SearchWord.Value + " exclude:retweets")) {
 					// ツイート本文が存在し、
 					string tweet = status.Text;
 					if (tweet == null)
