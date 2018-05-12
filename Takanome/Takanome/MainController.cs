@@ -83,7 +83,7 @@ namespace Takanome
 			progressFlg.Value = true;
 			searchResult.Clear();
 			try {
-				foreach (var status in await token.Search.TweetsAsync(count => 100, q => SearchWord.Value + " exclude:retweets")) {
+				foreach (var status in await Utility.SearchTweet(token, SearchWord.Value + " exclude:retweets", 100)) {
 					// ツイート本文が存在し、
 					string tweet = status.Text;
 					if (tweet == null)
@@ -204,6 +204,29 @@ namespace Takanome
 				}
 			}
 			return true;
+		}
+		public static async Task<List<Status>> SearchTweet(Tokens token, string searchWord, int _count) {
+			bool flg = true;
+			if (flg) {
+				var param = new Dictionary<string, object>(){
+					{ "q", searchWord }, { "count", _count * 2 }, { "result_type", "recent" }, { "modules", "status" }
+				};
+				var res = await token.SendRequestAsync(MethodType.Get, "https://api.twitter.com/1.1/search/universal.json", param);
+				string json = await res.Source.Content.ReadAsStringAsync();
+				var jsonObject = Newtonsoft.Json.Linq.JObject.Parse(json);
+				var modules = jsonObject["modules"].Children<Newtonsoft.Json.Linq.JObject>();
+				var tweets = new List<Status>();
+				foreach (var status in modules) {
+					foreach (Newtonsoft.Json.Linq.JProperty prop in status.Properties()) {
+						if (prop.Name == "status")
+							tweets.Add(CoreBase.Convert<Status>(Newtonsoft.Json.JsonConvert.SerializeObject(status["status"]["data"])));
+					}
+				}
+				return tweets;
+			}
+			else {
+				return (await token.Search.TweetsAsync(count => _count * 2, q => searchWord)).ToList();
+			}
 		}
 	}
 }
