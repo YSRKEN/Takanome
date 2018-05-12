@@ -32,7 +32,7 @@ namespace Takanome
 		private ReactiveProperty<bool> progressFlg = new ReactiveProperty<bool>(false);
 		private ReactiveProperty<bool> getTokenFlg = new ReactiveProperty<bool>(false);
 		private OAuthSession session;
-		private TokensBase token;
+		private Tokens token;
 
 		public MainController() {
 			LabelText = getTokenFlg.Select(flg => flg ? "PINコード" : "検索ワード").ToReadOnlyReactiveProperty();
@@ -46,6 +46,8 @@ namespace Takanome
 				if (getTokenFlg.Value) {
 					// トークン入力処理
 					token = session.GetTokens(SearchWord.Value);
+					Application.Current.Properties["AccessToken"] = token.AccessToken;
+					Application.Current.Properties["AccessTokenSecret"] = token.AccessTokenSecret;
 					getTokenFlg.Value = false;
 					SearchWord.Value = "";
 				}
@@ -60,8 +62,16 @@ namespace Takanome
 					Device.OpenUri(new Uri(url));
 				}
 			});
-			//
-			Login();
+			//トークンが保存されているかを確かめ、されてない場合に限りログイン処理を行う
+			if (Application.Current.Properties.ContainsKey("AccessToken")
+				&& Application.Current.Properties.ContainsKey("AccessTokenSecret")) {
+				token = Tokens.Create(Consumer.Key, Consumer.Secret,
+					Application.Current.Properties["AccessToken"] as string,
+					Application.Current.Properties["AccessTokenSecret"] as string);
+			}
+			else {
+				Login();
+			}
 		}
 
 		private async Task SearchTweet() {
