@@ -11,6 +11,7 @@ using Xamarin.Forms;
 using static CoreTweet.OAuth;
 using System.Text.RegularExpressions;
 using CoreTweet.Core;
+using System.Threading.Tasks;
 
 namespace Takanome
 {
@@ -48,51 +49,7 @@ namespace Takanome
 				}
 				else {
 					// 検索処理
-					progressFlg.Value = true;
-					searchResult.Clear();
-					var botList = new List<string> { "twittbot.net", "IFTTT", "rakubo2" };
-					try {
-						foreach (var status in await token.Search.TweetsAsync(count => 100, q => SearchWord.Value + " exclude:retweets lang:ja")) {
-							// ツイート本文が存在し、
-							string tweet = status.Text;
-							if (tweet == null)
-								continue;
-							// botツイートではなく
-							if (botList.Any(str => status.Source.Contains(str)))
-								continue;
-							if (status.User.Name.Contains("bot"))
-								continue;
-							// スクリーンネーム以外の部分でヒットした場合、
-							Regex rgx = new Regex("@[A-Za-z_]+");
-							tweet = rgx.Replace(tweet, "");
-							if (!Utility.IsMatch(tweet, SearchWord.Value))
-								continue;
-							// リストに加える
-							searchResult.Add(status);
-						}
-						progressFlg.Value = false;
-					}
-					catch (TwitterException e) {
-						// API呼び出し回数で規制を食らった場合の処理
-						Console.WriteLine(e.Message);
-						Console.WriteLine(e.StackTrace);
-						//規制解除時刻を算出する(日本時間に決め打ち)
-						var reset = e.RateLimit.Reset;
-						var fixedReset = reset.ToUniversalTime().AddHours(9);
-						string message = e.Message + "\n" + fixedReset.ToString("yyyy/MMM/dd HH:mm:ss zzz") + "に規制解除";
-						//算出した結果を表示
-						MessagingCenter.Send(this, "DisplayAlert", new AlertParameter() {
-							Title = "Takanome",
-							Message = message
-						});
-						progressFlg.Value = false;
-					}
-					catch (Exception e) {
-						// 
-						Console.WriteLine(e.Message);
-						Console.WriteLine(e.StackTrace);
-						progressFlg.Value = false;
-					}
+					await SearchTweet();
 				}
 			});
 			SelectTweet.Subscribe(s => {
@@ -112,6 +69,55 @@ namespace Takanome
 			}
 			else {
 				//token = OAuth2.GetToken(Consumer.Key, Consumer.Secret);
+			}
+		}
+
+		private async Task SearchTweet() {
+			// 検索処理
+			progressFlg.Value = true;
+			searchResult.Clear();
+			var botList = new List<string> { "twittbot.net", "IFTTT", "rakubo2" };
+			try {
+				foreach (var status in await token.Search.TweetsAsync(count => 100, q => SearchWord.Value + " exclude:retweets lang:ja")) {
+					// ツイート本文が存在し、
+					string tweet = status.Text;
+					if (tweet == null)
+						continue;
+					// botツイートではなく
+					if (botList.Any(str => status.Source.Contains(str)))
+						continue;
+					if (status.User.Name.Contains("bot"))
+						continue;
+					// スクリーンネーム以外の部分でヒットした場合、
+					Regex rgx = new Regex("@[A-Za-z_]+");
+					tweet = rgx.Replace(tweet, "");
+					if (!Utility.IsMatch(tweet, SearchWord.Value))
+						continue;
+					// リストに加える
+					searchResult.Add(status);
+				}
+				progressFlg.Value = false;
+			}
+			catch (TwitterException e) {
+				// API呼び出し回数で規制を食らった場合の処理
+				Console.WriteLine(e.Message);
+				Console.WriteLine(e.StackTrace);
+				//規制解除時刻を算出する(日本時間に決め打ち)
+				var reset = e.RateLimit.Reset;
+				var fixedReset = reset.ToUniversalTime().AddHours(9);
+				string message = e.Message + "\n" + fixedReset.ToString("yyyy/MMM/dd HH:mm:ss zzz") + "に規制解除";
+				//算出した結果を表示
+				MessagingCenter.Send(this, "DisplayAlert", new AlertParameter() {
+					Title = "Takanome",
+					Message = message
+				});
+				progressFlg.Value = false;
+			}
+			catch (Exception e) {
+				// 
+				Console.WriteLine(e.Message);
+				Console.WriteLine(e.StackTrace);
+				progressFlg.Value = false;
 			}
 		}
 	}
