@@ -12,7 +12,7 @@ namespace Takanome
 		public MainPage()
 		{
 			InitializeComponent();
-			this.BindingContext = new MainController();
+			this.BindingContext = new MainController(onCopy);
 		}
 
 		private void MainPage_Appearing(object sender, EventArgs e) {
@@ -26,5 +26,16 @@ namespace Takanome
 		private async void DisplayAlert<T>(T sender, AlertParameter arg) {
 			await DisplayAlert(arg.Title, arg.Message, "OK");
 		}
+
+		//コピー
+		public void onCopy(string text) {
+			DependencyService.Get<IClipBoardService>().Copy("", text);
+		}
+	}
+	public interface IClipBoardService
+	{
+		string Paste();
+
+		void Copy(string title, string target);
 	}
 }

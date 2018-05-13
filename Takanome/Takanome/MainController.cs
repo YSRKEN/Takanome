@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 
 namespace Takanome
 {
+	delegate void onCopyFunc(string text);
 	class MainController : INotifyPropertyChanged
 	{
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -27,22 +28,30 @@ namespace Takanome
 		private ReadOnlyReactiveProperty<bool> showListViewFlg { get; }
 		public ReactiveCommand SearchStartCommand { get; }
 		public ReactiveCommand LoginCommand { get; } = new ReactiveCommand();
+		public ReactiveCommand CopyLinkCommand { get; }
+		public ReactiveCommand OpenLinkCommand { get; }
+		public ReactiveCommand RtRtCommand { get; }
 
 		private ObservableCollection<Status> searchResult = new ObservableCollection<Status>();
 		private ReactiveProperty<bool> progressFlg = new ReactiveProperty<bool>(false);
 		private ReactiveProperty<bool> getTokenFlg = new ReactiveProperty<bool>(false);
 		private OAuthSession session;
 		private Tokens token;
+		private onCopyFunc onCopy;
 		private List<string> botList = new List<string> {
 			"twittbot.net", "IFTTT", "rakubo2", "makebot.sh", "BotMaker",
 			"twiroboJP", "Easybotter"
 		};
 
-		public MainController() {
+		public MainController(onCopyFunc onCopy) {
+			this.onCopy = onCopy;
 			LabelText = getTokenFlg.Select(flg => flg ? "PINコード" : "検索ワード").ToReadOnlyReactiveProperty();
 			ButtonText = getTokenFlg.Select(flg => flg ? "入力" : "検索").ToReadOnlyReactiveProperty();
 			showListViewFlg = getTokenFlg.Select(flg => !flg).ToReadOnlyReactiveProperty();
 			SearchStartCommand = SearchWord.Select(s => s.Length != 0).CombineLatest(progressFlg, (x, y) => x & !y).ToReactiveCommand();
+			CopyLinkCommand = SelectTweet.Select(t => t != null).ToReactiveCommand();
+			OpenLinkCommand = SelectTweet.Select(t => t != null).ToReactiveCommand();
+			RtRtCommand = SelectTweet.Select(t => t != null).ToReactiveCommand();
 			SearchResult = searchResult.ToReadOnlyReactiveCollection();
 			//
 			LoginCommand.Subscribe(_ => Login());
@@ -60,11 +69,16 @@ namespace Takanome
 					await SearchTweet();
 				}
 			});
-			SelectTweet.Subscribe(s => {
-				if (s != null) {
-					string url = "https://twitter.com/" + s.User.ScreenName + "/status/" + SelectTweet.Value.Id;
-					Device.OpenUri(new Uri(url));
-				}
+			CopyLinkCommand.Subscribe(_ => {
+				string url = "https://twitter.com/" + SelectTweet.Value.User.ScreenName + "/status/" + SelectTweet.Value.Id;
+				this.onCopy(url);
+			});
+			OpenLinkCommand.Subscribe(_ => {
+				string url = "https://twitter.com/" + SelectTweet.Value.User.ScreenName + "/status/" + SelectTweet.Value.Id;
+				Device.OpenUri(new Uri(url));
+			});
+			RtRtCommand.Subscribe(_ => {
+				
 			});
 			//トークンが保存されているかを確かめ、されてない場合に限りログイン処理を行う
 			if (Application.Current.Properties.ContainsKey("AccessToken")
@@ -228,5 +242,9 @@ namespace Takanome
 				return (await token.Search.TweetsAsync(count => _count * 2, q => searchWord)).ToList();
 			}
 		}
+	}
+	public interface IClipBoard
+	{
+		bool SetTextToClipBoard(string text);
 	}
 }

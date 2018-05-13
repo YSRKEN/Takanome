@@ -38,6 +38,16 @@
 				</DataTemplate>
 			</ListView.ItemTemplate>
 		</ListView>
+		<Grid>
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition/>
+				<ColumnDefinition/>
+				<ColumnDefinition/>
+			</Grid.ColumnDefinitions>
+			<Button Grid.Column="0" Text="リンクコピー" Command="{Binding CopyLinkCommand}"/>
+			<Button Grid.Column="1" Text="リンクを開く" Command="{Binding OpenLinkCommand}"/>
+			<Button Grid.Column="2" Text="RT直後を解析" Command="{Binding RtRtCommand}"/>
+		</Grid>
 	</StackLayout>
 
 </ContentPage>
