@@ -13,7 +13,7 @@
 			VerticalOptions="Center"
 			HorizontalOptions="Center"/>
 		<Entry Text="{Binding SearchWord.Value}" FontSize="Large"/>
-		<Button Text="{Binding ButtonText.Value}" FontSize="Large" Command="{Binding SearchStartCommand}"/>
+        <Button Text="{Binding ButtonText.Value}" FontSize="Large" Command="{Binding SearchStartCommand}"/>
 		<ListView ItemsSource="{Binding SearchResult}" SelectedItem="{Binding SelectTweet.Value}"
 				IsVisible="{Binding showListViewFlg.Value}" HasUnevenRows = "True">
 			<ListView.ItemTemplate>
@@ -29,10 +29,10 @@
 									<ColumnDefinition Width="auto"/>
 									<ColumnDefinition Width="auto"/>
 								</Grid.ColumnDefinitions>
-								<Label Grid.Column="0" Text="{Binding User.Name}" FontSize="Micro"/>
-								<Label Grid.Column="1" Text="{Binding User.ScreenName, StringFormat='@{0}'}" FontSize="Micro"/>
+								<Label Grid.Column="0" Text="{Binding User.Name}" FontSize="Medium"/>
+                                <Label Grid.Column="1" Text="{Binding User.ScreenName, StringFormat='@{0}'}" FontSize="Medium"/>
 							</Grid>
-							<Label Grid.Row="1" Text="{Binding Text}" FontSize="Micro"/>
+                            <Label Grid.Row="1" Text="{Binding Text}" FontSize="Medium"/>
 						</Grid>
 					</ViewCell>
 				</DataTemplate>
@@ -45,9 +45,8 @@
 				<ColumnDefinition/>
 			</Grid.ColumnDefinitions>
 			<Button Grid.Column="0" Text="リンクコピー" Command="{Binding CopyLinkCommand}"/>
-			<Button Grid.Column="1" Text="リンクを開く" Command="{Binding OpenLinkCommand}"/>
-			<Button Grid.Column="2" Text="RT直後を解析" Command="{Binding RtRtCommand}"/>
-		</Grid>
+            <Button Grid.Column="1" Text="リンクを開く" Command="{Binding OpenLinkCommand}"/>
+        </Grid>
 	</StackLayout>
 
 </ContentPage>
