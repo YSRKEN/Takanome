@@ -105,7 +105,7 @@ namespace Takanome
 					// botツイートではなく
 					if (botList.Any(str => status.Source.Contains(str)))
 						continue;
-					if (status.User.Name.Contains("bot"))
+					if (status.User.Name.ToLower().Contains("bot"))
 						continue;
 					// スクリーンネーム以外の部分でヒットした場合、
 					Regex rgx = new Regex("@[A-Za-z_]+");
@@ -220,7 +220,7 @@ namespace Takanome
 			return true;
 		}
 		public static async Task<List<Status>> SearchTweet(Tokens token, string searchWord, int _count) {
-			bool flg = true;
+			bool flg = false;
 			if (flg) {
 				var param = new Dictionary<string, object>(){
 					{ "q", searchWord }, { "count", _count * 2 }, { "result_type", "recent" }, { "modules", "status" }
